@@ -1,0 +1,9 @@
+src/server/ihm/IHM.java
+src/server/ihm/IHMConsole.java
+src/server/Server.java
+src/server/config/Config.java
+src/server/config/language/AbstractLanguage.java
+src/server/config/language/Language.java
+src/server/config/language/LanguageManager.java
+src/server/config/language/FRfr.java
+src/server/config/language/ENus.java

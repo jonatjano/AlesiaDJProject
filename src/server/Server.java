@@ -12,8 +12,8 @@ public class Server
 		IHM.printMessage("balec de ton port mec");
 		IHM.printMessage("Language = " + Config.getConfig("Language"));
 		IHM.printMessage("FillLanguage = " + Config.getConfig("FillLanguage"));
-		IHM.printMessage("Port = " + Config.getConfig("Port"));
 		IHM.printMessage("Port = " + port);
+		IHM.printMessage("MOTD = " + Config.getConfig("MOTD"));
 		IHM.printMessage("Interface = " + Config.getConfig("Interface"));
 	}
 
@@ -26,7 +26,7 @@ public class Server
 			{
 				port = Integer.parseInt(Config.getConfig("Port"));
 			}
-			catch (Exception e) {}
+			catch (Exception e) { /* Can't fail since if the config is invalid, it is replaced by default value which is valid */}
 			instance = new Server(port);
 		}
 		return instance;

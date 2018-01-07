@@ -4,9 +4,10 @@ import java.io.File;
 import java.io.PrintWriter;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Scanner;
 
-import server.config.language.LanguageManager;
 import server.config.language.Language;
+import server.config.language.LanguageManager;
 import server.ihm.IHM;
 
 public abstract class Config
@@ -21,6 +22,7 @@ public abstract class Config
 		defaultConfigMap.put("FillLanguage", "FRfr");
 		defaultConfigMap.put("Port", "7777");
 		defaultConfigMap.put("Interface", "Console");
+		defaultConfigMap.put("MOTD", "Welcome on this server :)");
 	}
 
 	public static String getConfig(String configName)
@@ -28,7 +30,7 @@ public abstract class Config
 		String configValue = configMap.get(configName);
 		if (configValue == null)
 		{
-			IHM.printMessage(LanguageManager.get("ConfigDoesNotExist") + " " + configName + " " + LanguageManager.get("PleaseContactDevs"));
+			IHM.printMessage(LanguageManager.get("ConfigDoesNotExist") + " " + configName + " " + LanguageManager.get("PleaseContactDevs"), IHM.ERROR);
 		}
 		return configValue;
 	}
@@ -44,9 +46,66 @@ public abstract class Config
 
 		configMap = new HashMap<String, String>();
 
-		// TODO actually get configs from file ><
-		for (String key : defaultConfigMap.keySet()) {
-			configMap.put(key, defaultConfigMap.get(key));
+		try
+		{
+			Scanner scan = new Scanner(configFile);
+			while(scan.hasNext())
+			{
+				String line = scan.nextLine();
+				if (!line.startsWith("#"))
+				{
+					String[] keyValueArr = line.split(":");
+					if (keyValueArr.length >= 2)
+					{
+						String value = "";
+						for (int i = 1; i < keyValueArr.length; i++)
+						{
+							if (i != 1) { value += ":"; }
+							value += keyValueArr[i];
+						}
+						configMap.put(keyValueArr[0], value);
+					}
+				}
+			}
+			scan.close();
+		}
+		catch (Exception e)
+		{
+			IHM.printMessage(LanguageManager.get("ConfigFileCantBeRead"), IHM.ERROR);
+		}
+
+		for (String key : defaultConfigMap.keySet())
+		{
+			String value = configMap.get(key);
+			boolean valueIsValid = true;
+			if (value == null)
+			{
+				valueIsValid = false;
+			}
+ 			else
+			{
+				switch (key)
+				{
+					// test if it is a valid int
+					case "Port":
+						if (!value.matches("[0-9]*")) { valueIsValid = false; }
+					break;
+
+					// test if it is a valid Language
+					case "Language":
+					case "FillLanguage":
+						if (Language.getLanguage(value, null) == null) { valueIsValid = false; }
+					break;
+
+					// no default case since it corresponds to configs with no need to verify value
+				}
+			}
+
+			if (!valueIsValid)
+			{
+				IHM.printMessage(LanguageManager.get("InvalidConfigValue") + key, IHM.ERROR);
+				configMap.put(key, defaultConfigMap.get(key));
+			}
 		}
 	}
 
@@ -66,7 +125,7 @@ public abstract class Config
 
 		if(!configFile.exists())
 		{
-			IHM.printMessage(LanguageManager.get("ConfigFileDoesNotExist"));
+			IHM.printMessage(LanguageManager.get("ConfigFileDoesNotExist"), IHM.ERROR);
 			IHM.printMessage(LanguageManager.get("CreatingConfigFileIn") + " " + configFile.getAbsolutePath());
 
 			try
@@ -74,13 +133,13 @@ public abstract class Config
 				configFile.getParentFile().mkdirs();
 				if (!configFile.createNewFile())
 				{
-					IHM.printMessage(LanguageManager.get("FailedToCreateDefaultConfigFile"));
+					IHM.printMessage(LanguageManager.get("FailedToCreateDefaultConfigFile"), IHM.ERROR);
 					System.exit(0);
 				}
 			}
 			catch (Exception e)
 			{
-				IHM.printMessage(LanguageManager.get("FailedToCreateDefaultConfigFile"));
+				IHM.printMessage(LanguageManager.get("FailedToCreateDefaultConfigFile"), IHM.ERROR);
 				e.printStackTrace();
 				System.exit(0);
 			}
@@ -100,6 +159,7 @@ public abstract class Config
 		String fillLanguage = defaultConfigMap.get("FillLanguage");
 		String port = defaultConfigMap.get("Port");
 		String ihmType = defaultConfigMap.get("Interface");
+		String motd = defaultConfigMap.get("MOTD");
 
 		try
 		{
@@ -112,7 +172,8 @@ public abstract class Config
 			pw.println();
 			pw.println("# every line starting with a '#' is not read");
 			pw.println("# config are written as 'propertyName:propertyValue'");
-			pw.println("# don't add space around the ':' nor modify propertyName or the config won't be recognized");
+			pw.println("# you can use ':' in value if needed");
+			pw.println("# don't add space around the ':' nor modify propertyName or the config could be invalidated");
 			pw.println("# take care of uppercase letters in values ;)");
 			pw.println("# starting now are the actual configs");
 			pw.println();
@@ -183,11 +244,23 @@ public abstract class Config
 
 
 
+			pw.println();
+			pw.println("# MOTD mean Message Of The Day");
+			pw.println("# it is a message shown to client at connection");
+			pw.println();
+			pw.println("# default value : " + motd);
+			pw.println("# every value is a valid value");
+			pw.println();
+			pw.println("MOTD:" + motd);
+			pw.println();
+
+
+
 			pw.close();
 		}
 		catch (Exception e)
 		{
-			IHM.printMessage(LanguageManager.get("FailedToCreateDefaultConfigFile"));
+			IHM.printMessage(LanguageManager.get("FailedToCreateDefaultConfigFile"), IHM.ERROR);
 			System.exit(0);
 		}
 	}

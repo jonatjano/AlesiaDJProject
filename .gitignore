@@ -1,2 +1,2 @@
-# ignore les classes compilée qui seront compiles sur le pc du développeur afin d'éviter la surcharge a chaque commit
+# ignore compiled files to limit size of git folder (they are obtained by compiling source files)
 /bin/*

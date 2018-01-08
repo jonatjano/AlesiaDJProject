@@ -3,8 +3,16 @@ package server.config.language;
 import java.util.HashMap;
 import java.util.Map;
 
-public class FRfr extends AbstractLanguage
+/**
+ * french Language from France (hope it is exact (I'm french ><))
+ * @author jonatjano
+ */
+class FRfr extends AbstractLanguage
 {
+	/**
+	 * method used to define translation pairs : key -> value
+	 * @return the map containning the translations linked to the keys
+	 */
 	@Override
 	Map<String, String> createTranslationMap()
 	{

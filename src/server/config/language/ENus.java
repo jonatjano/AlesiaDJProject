@@ -3,8 +3,16 @@ package server.config.language;
 import java.util.HashMap;
 import java.util.Map;
 
-public class ENus extends AbstractLanguage
+/**
+ * english Language from the USA (may be inexact)
+ * @author jonatjano
+ */
+class ENus extends AbstractLanguage
 {
+	/**
+	 * method used to define translation pairs : key -> value
+	 * @return the map containning the translations linked to the keys
+	 */
 	@Override
 	Map<String, String> createTranslationMap()
 	{

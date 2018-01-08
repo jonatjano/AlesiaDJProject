@@ -1,5 +1,9 @@
 package server.ihm;
 
+/**
+ * IHM class used to write and read using console
+ * @author jonatjano
+ */
 public class IHMConsole extends IHM
 {
 	// static final String RESET = "\u001B[0m";
@@ -22,6 +26,13 @@ public class IHMConsole extends IHM
 	// static final String CYAN_BACKGROUND = "\u001B[46m";
 	// static final String WHITE_BACKGROUND = "\u001B[47m";
 
+	/**
+	 * print message on console
+	 * styles are ANSI and will work only on Unix systems
+	 * @param message message to print
+	 * @param styles  style to add to message
+	 */
+	@Override
 	public void printMsg(String message, String... styles)
 	{
 		System.out.println(message);

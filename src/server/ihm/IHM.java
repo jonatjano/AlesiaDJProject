@@ -78,6 +78,10 @@ public abstract class IHM
 	 * style for error messages
 	 */
 	public static final String ERROR = "ERROR";
+	/**
+	 * style for info messages
+	 */
+	public static final String INFO = "INFO";
 
 	/**
 	 * window type for IHM, create a graphical window

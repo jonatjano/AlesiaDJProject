@@ -33,9 +33,10 @@ public abstract class Config
 		defaultConfigMap = new HashMap<String, String>();
 		defaultConfigMap.put("Language", "ENus");
 		defaultConfigMap.put("FillLanguage", "FRfr");
-		defaultConfigMap.put("Port", "7777");
+		defaultConfigMap.put("Port", "0");
 		defaultConfigMap.put("Interface", "Console");
 		defaultConfigMap.put("MOTD", "Welcome on this server :)");
+		defaultConfigMap.put("MaxPlayers", "-1");
 	}
 
 	/**
@@ -51,9 +52,33 @@ public abstract class Config
 		String configValue = configMap.get(configName);
 		if (configValue == null)
 		{
-			IHM.printMessage(LanguageManager.get("ConfigDoesNotExist") + " " + configName + " " + LanguageManager.get("PleaseContactDevs"), IHM.ERROR);
+			IHM.printMessage(LanguageManager.get("ConfigDoesNotExist") + configName + " " + LanguageManager.get("PleaseContactDevs"), IHM.ERROR);
 		}
 		return configValue;
+	}
+
+	/**
+	 * method used to set port value if the one in config file is 0
+	 * @param port the port which is allocated to the server
+	 */
+	public static void setPort(int port)
+	{
+		if (getConfig("Port").equals("0"))
+		{
+			configMap.put("Port", "" + port);
+		}
+	}
+
+	/**
+	 * method used to print every config pair onto the IHM
+	 */
+	public static void printConfigs()
+	{
+		IHM.printMessage(LanguageManager.get("PrintingConfigs"), IHM.INFO);
+		for (String key : configMap.keySet())
+		{
+			IHM.printMessage(key + " = " + configMap.get(key), IHM.INFO);
+		}
 	}
 
 	/**
@@ -127,9 +152,20 @@ public abstract class Config
 				// valid it according to it's type
 				switch (key)
 				{
-					// test if it is a valid int
+					// test if it is a valid positive int
 					case "Port":
-						if (!value.matches("[0-9]*")) { valueIsValid = false; }
+						// port must be an integer
+						if (!value.matches("[0-9]*"))
+							{ valueIsValid = false; }
+						// here port is numeric so parse will work
+						// port must be between 0 and 65535 included
+						else if (Integer.parseInt(value) < 0 || Integer.parseInt(value) > 65535)
+							{ valueIsValid = false; }
+					break;
+
+					// test if it is a valid int
+					case "MaxPlayers":
+						if (!value.matches("-?[0-9]*")) { valueIsValid = false; }
 					break;
 
 					// test if it is a valid Language
@@ -146,7 +182,7 @@ public abstract class Config
 			// if the value is not valid replace it with default one
 			if (!valueIsValid)
 			{
-				IHM.printMessage(LanguageManager.get("InvalidConfigValue") + key, IHM.ERROR);
+				IHM.printMessage(LanguageManager.get("InvalidConfigValue") + key + "(" + value + ")", IHM.ERROR);
 				configMap.put(key, defaultConfigMap.get(key));
 			}
 		}
@@ -226,6 +262,7 @@ public abstract class Config
 		String port = defaultConfigMap.get("Port");
 		String ihmType = defaultConfigMap.get("Interface");
 		String motd = defaultConfigMap.get("MOTD");
+		String maxPlayers = defaultConfigMap.get("MaxPlayers");
 
 		// the printwriter may fail
 		try
@@ -238,7 +275,7 @@ public abstract class Config
 			/***********************************/
 			pw.println("# Hello this is the default config file");
 			pw.println("# in this file are the default values for config");
-			pw.println("# every missing config from your final file is going to take these values");
+			pw.println("# every missing config or invalid values from your final file is going to take these values");
 			pw.println("# if you want to recreate, you just need to delete it");
 			pw.println();
 			pw.println("# every line starting with a '#' is not read");
@@ -299,8 +336,11 @@ public abstract class Config
 			pw.println("# !!! WARNING !!! opening a port may cause security issues in your network don't do it if not needed");
 			pw.println();
 			pw.println("# default value : " + port);
-			pw.println("# possible values are integers from 1000 to 65000");
-			pw.println("# other values may work but be careful there is a maximum of one software per port");
+			pw.println("# possible values are integers from 0 to 65565 included");
+			pw.println("# you can use 0 to get a random valid port (need client to change connection port at each server restart)");
+			pw.println("# be careful there is a maximum of one software per port");
+			pw.println("# port from 1 to 1000 are oftenly already used");
+			pw.println("# port from 1000 are most of the time available");
 			pw.println("# change here if you got an error stating port is already used");
 			pw.println();
 			pw.println("Port:" + port);
@@ -340,6 +380,22 @@ public abstract class Config
 			pw.println("# every value is a valid value");
 			pw.println();
 			pw.println("MOTD:" + motd);
+			pw.println();
+
+
+
+			/***********************************/
+			/* message of the day config       */
+			/***********************************/
+			pw.println();
+			pw.println("# MaxPlayers is the maximum number of players connected simultaneusly");
+			pw.println();
+			pw.println("# default value : " + maxPlayers);
+			pw.println("# value must be a valid integer");
+			pw.println("# value = 0 mean nobody can connect (bad idea)");
+			pw.println("# value < 0 mean no player limit");
+			pw.println();
+			pw.println("MaxPlayers:" + maxPlayers);
 			pw.println();
 
 
